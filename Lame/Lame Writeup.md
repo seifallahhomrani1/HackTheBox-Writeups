@@ -11,7 +11,7 @@
 ### Nmap Scan
 ```bash
 nmap -sC -sV -oN nmap_scan.txt -Pn 
-```
+``` 
 
 ```
 PORT    STATE SERVICE     REASON  VERSION
