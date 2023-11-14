@@ -1,8 +1,3 @@
----
-cover: broken-reference
-coverY: 0
----
-
 # HackTheBox Writeups
 
 ## Description
