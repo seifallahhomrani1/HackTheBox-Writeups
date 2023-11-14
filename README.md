@@ -5,6 +5,7 @@ coverY: 0
 
 # HackTheBox Writeups
 
+
 ## Description
 
 This repository contains detailed writeups for various Hack The Box machines and challenges that I've tackled, following the suggested machines by TJ\_Null. These writeups serve as a comprehensive guide for each penetration testing scenario, documenting the enumeration, exploitation, privilege escalation, and key takeaways.
