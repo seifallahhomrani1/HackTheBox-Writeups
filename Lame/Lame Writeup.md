@@ -1,9 +1,12 @@
 ---
+description: Retired - Lame Machine Detailed Writeup.
 cover: ../.gitbook/assets/bg (1).png
 coverY: -47.96423248882266
 ---
 
 # Lame Writeup
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
 ### Information
 
