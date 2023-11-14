@@ -33,12 +33,12 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ## Initial Access
 ### Port [80] - [Codify Web Application]
 
-![[Codify Writeup - About Us interface.png]]
+![](Codify%20Writeup%20-%20Codify%20Web%20Application.png)
 
 The application serves an Node JS editor in a sandboxed environment using [vm2 library](https://github.com/patriksimek/vm2)
 
 
-![[Editor - SSTI.png]]
+![](Codify%20Writeup%20-%20Editor.png)
 
 
 #### Vulnerability Exploited
@@ -203,13 +203,13 @@ The extracted password is the root password and can be used to su through.
     - **Technique:** Input Capture
     - **MITRE ATT&CK ID:** T1056
 
-![[Codify Writeup - Mitre Attack Mapping.png]]
+![](Codify%20Writeup%20-%20Mitre%20Attack%20Mapping-1.png)
+
 ## Additional Notes
 ### Defensive Techniques
 - Keep software and libraries up to date to patch known vulnerabilities.
 - Implement proper input validation and sanitization in the web application to prevent injection attacks.
 - Review and restrict sudo permissions to only necessary commands and users.
 - Don't input sensitive data, such as passwords, directly as bash commands from the command line to prevent accidental exposure.
-
 
 
