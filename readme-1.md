@@ -1,5 +1,5 @@
 ---
-cover: broken-reference
+cover: .gitbook/assets/bg (1).png
 coverY: 0
 ---
 
@@ -15,16 +15,16 @@ I am actively using this repository as part of my preparation for the Offensive 
 
 ## Table of Contents
 
-* [Information](./#information)
-* [Enumeration](./#enumeration)
-* [Initial Access](./#initial-access)
-  * [Port \[X\] - \[Service Name\]](./#port-x---service-name)
-* [User Access](./#user-access)
-* [Privilege Escalation](./#privilege-escalation)
-* [Conclusion](./#conclusion)
-* [Additional Notes](./#additional-notes)
-* [Resources](./#resources)
-* [Acknowledgments](./#acknowledgments)
+* [Information](readme-1.md#information)
+* [Enumeration](readme-1.md#enumeration)
+* [Initial Access](readme-1.md#initial-access)
+  * [Port \[X\] - \[Service Name\]](readme-1.md#port-x---service-name)
+* [User Access](readme-1.md#user-access)
+* [Privilege Escalation](readme-1.md#privilege-escalation)
+* [Conclusion](readme-1.md#conclusion)
+* [Additional Notes](readme-1.md#additional-notes)
+* [Resources](readme-1.md#resources)
+* [Acknowledgments](readme-1.md#acknowledgments)
 
 ## Information
 
